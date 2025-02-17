@@ -14,7 +14,7 @@ module.exports.addWorkout = (req, res) => {
     });
 };
 
-module.exports.getAllWorkouts = (req, res) => {
+module.exports.getMyWorkouts = (req, res) => {
   Workout.find({})
     .then((workouts) => {
       if (workouts.length > 0) {
@@ -76,5 +76,37 @@ module.exports.deleteWorkout = (req, res) => {
     .catch((err) => {
       console.error("Error in deleting workout: ", err);
       return res.status(500).send({ error: "Error in deleting workout." });
+    });
+};
+
+module.exports.completeWorkoutStatus = (req, res) => {
+    let updateActiveField = {
+        isActive: false // Mark the workout as completed
+    };
+
+    return Workout.findByIdAndUpdate(req.params.id, updateActiveField)
+    .then(workout => {
+        // Check if the workout was found
+        if (workout) {
+            // If workout already completed (isActive = false), return a 200 status with a message
+            if (!workout.isActive) {
+                return res.status(200).send({
+                    message: 'Workout already completed',
+                    workoutDetails: workout // Include the workout details here
+                });
+            }
+            // If workout not completed, mark it as completed and return a success message
+            return res.status(200).send({
+                success: true,
+                message: 'Workout completed successfully'
+            });
+        } else {
+            // If workout not found, return a 404 status with an error message
+            return res.status(404).send({error: 'Workout not found'});
+        }
+    })
+    .catch(error => {
+        console.error("Error in completing workout: ", error);
+        return res.status(500).send({error: 'Error in completing workout.'});
     });
 };
