@@ -1,20 +1,18 @@
 const Workout = require("../models/Workout");
 
 module.exports.addWorkout = (req, res) => {
+
   let newWorkout = new Workout({
-    name: req.body.name, 
-    duration: req.body.duration, 
-    status: req.body.status, 
+    name: req.body.name,
+    duration: req.body.duration,
+    status: req.body.status
   });
 
-  newWorkout
-    .save()
-    .then((savedWorkout) => res.status(201).send(savedWorkout))
-    .catch((saveErr) => {
-      console.error("Error in saving the workout: ", saveErr);
-      return res.status(500).send({ error: "Failed to save the workout" });
-    });
+  return newWorkout.save()
+    .then((workout) => res.status(201).send({ workout }))
+    .catch((err) => res.status(500).send({ error: "Error in Save", details: err }));
 };
+
 
 module.exports.getMyWorkouts = (req, res) => {
   Workout.find({})
@@ -46,28 +44,21 @@ module.exports.getWorkoutById = (req, res) => {
 };
 
 module.exports.updateWorkout = (req, res) => {
-  let workoutUpdates = {
+
+  let updatedWorkout = {
     name: req.body.name,
     duration: req.body.duration,
-    status: req.body.status,
-    isActive: req.body.isActive
+    status: req.body.status
   };
 
-  return Workout.findByIdAndUpdate(req.params.id, workoutUpdates, { new: true })
-    .then((updatedWorkout) => {
-      if (!updatedWorkout) {
-        return res.status(404).send({ error: "Workout not found" });
-      }
-      return res.status(200).send({
-        message: "Workout updated successfully",
-        updatedWorkout: updatedWorkout
-      });
-    })
-    .catch((err) => {
-      console.error("Error in updating workout: ", err);
-      return res.status(500).send({ error: "Error in updating workout." });
-    });
+  return Workout.findByIdAndUpdate(req.params.workoutId, updatedWorkout, { new: true })
+    .then((workout) => res.status(200).send({
+      message: 'Workout updated successfully',
+      updatedWorkout: workout
+    }))
+    .catch(err => res.status(500).send({ error: "Error in Saving", details: err }));
 };
+
 
 module.exports.deleteWorkout = (req, res) => {
   return Workout.findByIdAndDelete(req.params.id)
