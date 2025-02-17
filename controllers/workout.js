@@ -5,7 +5,6 @@ module.exports.addWorkout = (req, res) => {
   let newWorkout = new Workout({
     name: req.body.name,
     duration: req.body.duration,
-    status: req.body.status
   });
 
   return newWorkout.save()

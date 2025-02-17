@@ -15,8 +15,7 @@ const workoutSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['in-progress', 'completed', 'not-started'], // Status can be one of these values
-    default: 'not-started'
+    default: 'Pending'
   },
   isActive: {
     type: Boolean,
