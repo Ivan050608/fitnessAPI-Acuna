@@ -1,17 +1,26 @@
 const mongoose = require('mongoose');
 
 const workoutSchema = new mongoose.Schema({
-  title: {
+  name: {
     type: String,
-    required: [true, 'Workout title is required']
+    required: [true, 'Workout name is required']
   },
-  date: {
+  duration: {
+    type: Number, // in minutes or seconds
+    required: [true, 'Workout duration is required']
+  },
+  dateAdded: {
     type: Date,
-    default: Date.now
+    default: Date.now // Timestamp when the workout is added
+  },
+  status: {
+    type: String,
+    enum: ['in-progress', 'completed', 'not-started'], // Status can be one of these values
+    default: 'not-started'
   },
   isActive: {
     type: Boolean,
-    default: true
+    default: true // Indicates if the workout is currently active
   }
 });
 

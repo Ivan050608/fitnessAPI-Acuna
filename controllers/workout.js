@@ -2,7 +2,9 @@ const Workout = require("../models/Workout");
 
 module.exports.addWorkout = (req, res) => {
   let newWorkout = new Workout({
-    title: req.body.title
+    name: req.body.name, 
+    duration: req.body.duration, 
+    status: req.body.status, 
   });
 
   newWorkout
@@ -45,7 +47,9 @@ module.exports.getWorkoutById = (req, res) => {
 
 module.exports.updateWorkout = (req, res) => {
   let workoutUpdates = {
-    title: req.body.title,
+    name: req.body.name,
+    duration: req.body.duration,
+    status: req.body.status,
     isActive: req.body.isActive
   };
 
@@ -80,33 +84,31 @@ module.exports.deleteWorkout = (req, res) => {
 };
 
 module.exports.completeWorkoutStatus = (req, res) => {
-    let updateActiveField = {
-        isActive: false // Mark the workout as completed
-    };
+  let updateActiveField = {
+    isActive: false, // Mark the workout as completed
+    status: "completed" // Update status to 'completed'
+  };
 
-    return Workout.findByIdAndUpdate(req.params.id, updateActiveField)
+  return Workout.findByIdAndUpdate(req.params.id, updateActiveField, { new: true }) // Ensure `new: true` to return the updated workout
     .then(workout => {
-        // Check if the workout was found
-        if (workout) {
-            // If workout already completed (isActive = false), return a 200 status with a message
-            if (!workout.isActive) {
-                return res.status(200).send({
-                    message: 'Workout already completed',
-                    workoutDetails: workout // Include the workout details here
-                });
-            }
-            // If workout not completed, mark it as completed and return a success message
-            return res.status(200).send({
-                success: true,
-                message: 'Workout completed successfully'
-            });
-        } else {
-            // If workout not found, return a 404 status with an error message
-            return res.status(404).send({error: 'Workout not found'});
+      if (workout) {
+        if (!workout.isActive) {
+          return res.status(200).send({
+            message: 'Workout already completed',
+            workoutDetails: workout
+          });
         }
+        return res.status(200).send({
+          success: true,
+          message: 'Workout completed successfully',
+          workoutDetails: workout
+        });
+      } else {
+        return res.status(404).send({error: 'Workout not found'});
+      }
     })
     .catch(error => {
-        console.error("Error in completing workout: ", error);
-        return res.status(500).send({error: 'Error in completing workout.'});
+      console.error("Error in completing workout: ", error);
+      return res.status(500).send({error: 'Error in completing workout.'});
     });
 };
